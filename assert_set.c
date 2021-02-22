@@ -294,21 +294,22 @@ void validate_set_operations(unsigned int seed)
 	testset = generate_set(seed, TEST_SET_SIZE);
 	a = set_create(compare_ints);
 	b = set_create(compare_ints);
-	
+
 	split_set(testset, a, b);
-	
+
 	/* Run the set operations */
 	res_union = set_union(a, b);
-	res_inter = set_intersection(a, b);
+
+    res_inter = set_intersection(a, b);
 	res_diff = set_difference(a, b);
-	
+
 	if(!check_set_integrity(res_union))
 		fatal_error("Union set is invalid");
 	if(!check_set_integrity(res_inter))
 		fatal_error("Intersection set is invalid");
 	if(!check_set_integrity(res_diff))
 		fatal_error("Difference set is invalid");
-		
+
 	if(TEST_PRINT_SET)
 	{
 		printset("\tfull set", testset);
@@ -339,7 +340,7 @@ void validate_set_operations(unsigned int seed)
 			fatal_error("Set difference is not correct");
 	}
 	set_destroyiter(iter);
-	
+
 	/* Cleanup */
 	set_destroy(res_diff);
 	set_destroy(res_inter);
@@ -369,12 +370,12 @@ int main(int argc, char **argv)
 	printf("Validating set iterator...\n");
 	for(i = 0; i < TEST_RUNS; i++)
 		validate_iterator(i);
-	
+
 	/* Validating set operations */
 	printf("Validating set operations...\n");
 	for(i = 0; i < TEST_RUNS; i++)
-		validate_set_operations(i);
-	
+        validate_set_operations(i);
+
 	return 0;
 }
 

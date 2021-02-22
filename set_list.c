@@ -256,6 +256,7 @@ set_t *set_intersection(set_t *a, set_t *b) {
     tmp_a = aa->head;
     tmp_b = bb->head;
 
+    // If one of the sets is empty, return an empty set. (No intersection.)
     if (tmp_a == NULL)
         return aa;
     if (tmp_b == NULL)
@@ -322,6 +323,7 @@ set_t *set_difference(set_t *a, set_t *b) {
     tmp_a = aa->head;
     tmp_b = bb->head;
 
+    // If a is empty, return an empty set. If b is empty, return a.
     if (tmp_a == NULL)
         return set;
     if (tmp_b == NULL)
