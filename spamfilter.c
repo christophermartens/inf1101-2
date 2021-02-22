@@ -95,6 +95,8 @@ int main(int argc, char **argv)
 	list_destroyiter(spam_iter);
 	list_destroy(spam_files);
 
+	printwords("spam", spam_set);
+
     // add all non spam words to a set
     while (list_hasnext(non_spam_iter)) {
 	    non_spam_set = set_union(non_spam_set, tokenize(list_next(non_spam_iter)));

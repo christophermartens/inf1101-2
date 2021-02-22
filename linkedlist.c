@@ -3,30 +3,30 @@
 
 #include <stdlib.h>
 
-struct listnode;
+struct node;
 
-typedef struct listnode listnode_t;
+typedef struct node node_t;
 
-struct listnode {
-    listnode_t *next;
-    listnode_t *prev;
+struct node {
+    node_t *next;
+    node_t *prev;
     void *elem;
 };
 
 struct list {
-    listnode_t *head;
-    listnode_t *tail;
+    node_t *head;
+    node_t *tail;
     int size;
     cmpfunc_t cmpfunc;
 };
 
 struct list_iter {
-    listnode_t *node;
+    node_t *node;
 };
 
-static listnode_t *newnode(void *elem)
+static node_t *newnode(void *elem)
 {
-    listnode_t *node = malloc(sizeof(listnode_t));
+    node_t *node = malloc(sizeof(node_t));
     if (node == NULL)
         return NULL;
     
@@ -51,9 +51,9 @@ list_t *list_create(cmpfunc_t cmpfunc)
 
 void list_destroy(list_t *list)
 {
-    listnode_t *node = list->head;
+    node_t *node = list->head;
     while (node != NULL) {
-	    listnode_t *tmp = node;
+	    node_t *tmp = node;
 	    node = node->next;
 	    free(tmp);
     }
@@ -67,7 +67,7 @@ int list_size(list_t *list)
 
 int list_addfirst(list_t *list, void *elem)
 {
-    listnode_t *node = newnode(elem);
+    node_t *node = newnode(elem);
     if (node == NULL)
         return 0;
     
@@ -85,7 +85,7 @@ int list_addfirst(list_t *list, void *elem)
 
 int list_addlast(list_t *list, void *elem)
 {
-    listnode_t *node = newnode(elem);
+    node_t *node = newnode(elem);
     if (node == NULL)
         return 0;
     
@@ -108,7 +108,7 @@ void *list_popfirst(list_t *list)
     }
     else {
         void *elem = list->head->elem;
-	    listnode_t *tmp = list->head;
+	    node_t *tmp = list->head;
 	    list->head = list->head->next;
 	    if (list->head == NULL) {
 	        list->tail = NULL;
@@ -129,7 +129,7 @@ void *list_poplast(list_t *list)
     }
     else {
         void *elem = list->tail->elem;
-	    listnode_t *tmp = list->tail;
+	    node_t *tmp = list->tail;
 	    list->tail = list->tail->prev;
 	    if (list->tail == NULL) {
 	        list->head = NULL;
@@ -145,7 +145,7 @@ void *list_poplast(list_t *list)
 
 int list_contains(list_t *list, void *elem)
 {
-    listnode_t *node = list->head;
+    node_t *node = list->head;
     while (node != NULL) {
 	    if (list->cmpfunc(elem, node->elem) == 0)
 	        return 1;
@@ -159,9 +159,9 @@ int list_contains(list_t *list, void *elem)
  * Only assigns the next pointers; the prev pointers will have to be
  * fixed by the caller.  Returns the head of the merged list.
  */
-static listnode_t *merge(listnode_t *a, listnode_t *b, cmpfunc_t cmpfunc)
+static node_t *merge(node_t *a, node_t *b, cmpfunc_t cmpfunc)
 {
-	listnode_t *head, *tail;
+	node_t *head, *tail;
 	
 	/* Pick the smallest head node */
 	if (cmpfunc(a->elem, b->elem) < 0) {
@@ -199,9 +199,9 @@ static listnode_t *merge(listnode_t *a, listnode_t *b, cmpfunc_t cmpfunc)
  * Splits the given list in two halves, and returns the head of
  * the second half.
  */
-static listnode_t *splitlist(listnode_t *head)
+static node_t *splitlist(node_t *head)
 {
-	listnode_t *slow, *fast, *half;
+	node_t *slow, *fast, *half;
 	
 	/* Move two pointers, a 'slow' one and a 'fast' one which moves
 	 * twice as fast.  When the fast one reaches the end of the list,
@@ -224,13 +224,13 @@ static listnode_t *splitlist(listnode_t *head)
  * collision with the mergesort function that is defined by the standard
  * library on some platforms.
  */
-static listnode_t *mergesort_(listnode_t *head, cmpfunc_t cmpfunc)
+static node_t *mergesort_(node_t *head, cmpfunc_t cmpfunc)
 {
     if (head->next == NULL) {
         return head;
     }
     else {
-        listnode_t *half = splitlist(head);
+        node_t *half = splitlist(head);
         head = mergesort_(head, cmpfunc);
         half = mergesort_(half, cmpfunc);
         return merge(head, half, cmpfunc);
@@ -240,7 +240,7 @@ static listnode_t *mergesort_(listnode_t *head, cmpfunc_t cmpfunc)
 void list_sort(list_t *list)
 {
     if (list->head != NULL) {
-        listnode_t *prev, *n;
+        node_t *prev, *n;
     
         /* Recursively sort the list */
         list->head = mergesort_(list->head, list->cmpfunc);
@@ -260,7 +260,7 @@ void list_sort(list_t *list)
  */
 static void list_selection_sort(list_t *list)
 {
-    listnode_t *min, *i, *j;
+    node_t *min, *i, *j;
 
     if (list->size < 2)
 	    return;

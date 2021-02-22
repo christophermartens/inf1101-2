@@ -31,6 +31,7 @@ static void printset(char *prefix, set_t *set)
 	    printf(" %d", *p);
     }
     printf("\n");
+
     set_destroyiter(it);
 }
 
