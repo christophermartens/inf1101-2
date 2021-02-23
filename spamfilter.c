@@ -86,6 +86,7 @@ int main(int argc, char **argv)
 	list_iter_t *mail_iter = list_createiter(mail_files);
 
 	set_t *spam_prev = tokenize(list_next(spam_iter));
+
     // add all spam words to a set
 	while (list_hasnext(spam_iter)) {
 	    set_t *spam = tokenize(list_next(spam_iter));

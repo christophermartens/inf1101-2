@@ -14,14 +14,12 @@ struct set {
     int max_size;
 };
 
-
 /*
  * Creates a new set using the given comparison function
  * to compare elements of the set.
  */
 set_t *set_create(cmpfunc_t cmpfunc) {
     set_t *set = malloc(sizeof(set_t));
-    //printf("Create: %p\n", set);
 
     if (set == NULL)
         return NULL;
@@ -44,8 +42,6 @@ set_t *set_create(cmpfunc_t cmpfunc) {
  * will lead to undefined behavior.
  */
 void set_destroy(set_t *set) {
-    //printf("Destroy: %p\n", set);
-
     free(set->items);
     free(set);
 }
@@ -134,10 +130,11 @@ set_t *set_union(set_t *a, set_t *b) {
     int a_pos = 0;
     int b_pos = 0;
 
-    // Add elements until one set is empty.
+    /* Add elements until one set is empty. */
     while (a_pos < a->size && b_pos < b->size) {
         if (set->size >= set->max_size)
             set_resize(set);
+
         if (set->cmpfunc(a->items[a_pos], b->items[b_pos]) > 0) {
             set->items[pos] = b->items[b_pos];
             b_pos++;
@@ -157,7 +154,7 @@ set_t *set_union(set_t *a, set_t *b) {
         }
     }
 
-    // Add remaining elements from other set.
+    /* Add remaining elements from non-empty set. */
     while (a_pos < a->size) {
         if (set->size >= set->max_size){
             set_resize(set);
@@ -196,19 +193,26 @@ set_t *set_intersection(set_t *a, set_t *b) {
     if (b->size == 0)
         return b;
 
-    int pos = 0;
+    int pos, a_pos, b_pos;
+    pos = 0;
+    a_pos = 0;
+    b_pos = 0;
 
-    for (int i = 0; i < a->size; i++) {
-        if (set->size >= set->max_size)
-            set_resize(set);
+    /* Add all elements with equal value. */
+    while (a_pos < a->size && b_pos < b->size) {
+        if (set->cmpfunc(a->items[a_pos], b->items[b_pos]) > 0) {
+            b_pos++;
+        } else if (set->cmpfunc(a->items[a_pos], b->items[b_pos]) == 0) {
+            if (set->size >= set->max_size)
+                set_resize(set);
 
-        for (int j = 0; j < b->size; j++) {
-            if (set->cmpfunc(a->items[i], b->items[j]) == 0) {
-                set->items[pos] = a->items[i];
-                set->size++;
-                pos++;
-                break;
-            }
+            set->items[pos] = a->items[a_pos];
+            set->size++;
+            a_pos++;
+            b_pos++;
+            pos++;
+        } else {
+            a_pos++;
         }
     }
 
@@ -226,32 +230,44 @@ set_t *set_difference(set_t *a, set_t *b) {
     if (set == NULL)
         return NULL;
 
-    // If a is empty, return an empty set. If b is empty, return a.
+    /* If a is empty, return an empty set. If b is empty, return a. */
     if (a->size == 0)
         return set;
     if (b->size == 0)
         return a;
 
-    int pos = 0;
+    int pos, a_pos, b_pos;
+    pos = 0;
+    a_pos = 0;
+    b_pos = 0;
 
-    for (int i = 0; i < a->size; i++) {
-        int add = 1;
-
-        for (int j = 0; j < b->size; j++) {
-            if (set->cmpfunc(a->items[i], b->items[j]) == 0) {
-                add = 0;
-                break;
-            }
-        }
-
-        if (add == 1) {
+    /* Insert elements from a that are not contained in b. */
+    while (a_pos < a->size && b_pos < b->size) {
+        if (set->cmpfunc(a->items[a_pos], b->items[b_pos]) > 0) {
+            b_pos++;
+        } else if (set->cmpfunc(a->items[a_pos], b->items[b_pos]) == 0) {
+            a_pos++;
+            b_pos++;
+        } else {
             if (set->size >= set->max_size)
                 set_resize(set);
 
-            set->items[pos] = a->items[i];
+            set->items[pos] = a->items[a_pos];
             set->size++;
+            a_pos++;
             pos++;
         }
+    }
+
+    /* Add remaining elements */
+    while (a_pos < a->size) {
+        if (set->size >= set->max_size){
+            set_resize(set);
+        }
+        set->items[pos] = a->items[a_pos];
+        a_pos++;
+        pos++;
+        set->size++;
     }
 
     return set;
@@ -318,7 +334,6 @@ int set_hasnext(set_iter_t *iter) {
     if (iter->index == iter->set->size) {
         return 0;
     }
-
     return 1;
 }
 

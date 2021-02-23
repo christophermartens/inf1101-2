@@ -331,7 +331,7 @@ void validate_set_operations(unsigned int seed)
 		if(!set_contains(res_union, elem))
 			fatal_error("Set union is not correct");
 	
-		/* Validating intersection (always in both)*/
+		/* Validating intersection (always in both) */
 		if(set_contains(a, elem) && set_contains(b, elem) && !set_contains(res_inter, elem))
 			fatal_error("Set intersection is not correct");
 		

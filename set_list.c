@@ -169,7 +169,7 @@ set_t *set_union(set_t *a, set_t *b) {
     tmp_a = aa->head;
     tmp_b = bb->head;
 
-    // If one set is empty, return the other.
+    /* If one set is empty, return the other. */
     if (tmp_a == NULL) {
         return bb;
     }
@@ -177,7 +177,7 @@ set_t *set_union(set_t *a, set_t *b) {
         return aa;
     }
 
-    // Find head for union set.
+    /* Find head node for union set. */
     if (set->cmpfunc(tmp_a->item, tmp_b->item) > 0) {
         set->head = tmp_b;
         set->size++;
@@ -195,7 +195,7 @@ set_t *set_union(set_t *a, set_t *b) {
 
     node_t *tmp_u = set->head;
 
-    // Insert elements from both sets in ascending order.
+    /* Insert elements in ascending order. */
     while (tmp_a != NULL && tmp_b != NULL) {
         if (set->cmpfunc(tmp_a->item, tmp_b->item) > 0) {
             tmp_u->next = tmp_b;
@@ -214,7 +214,7 @@ set_t *set_union(set_t *a, set_t *b) {
         tmp_u = tmp_u->next;
     }
 
-    // If sets have different sizes, insert elements of remaining set.
+    /* Add remaining elements to union set. */
     if (tmp_a != NULL) {
         while (tmp_a != NULL) {
             tmp_u->next = tmp_a;
@@ -242,7 +242,6 @@ set_t *set_union(set_t *a, set_t *b) {
  */
 set_t *set_intersection(set_t *a, set_t *b) {
     set_t *set = set_create(a->cmpfunc);
-
     if (set == NULL)
         return NULL;
 
@@ -255,50 +254,39 @@ set_t *set_intersection(set_t *a, set_t *b) {
 
     tmp_a = aa->head;
     tmp_b = bb->head;
+    tmp_i = NULL;
 
-    // If one of the sets is empty, return an empty set. (No intersection.)
+    /* If one of the sets is empty, return an empty set (no intersection.) */
     if (tmp_a == NULL)
         return aa;
     if (tmp_b == NULL)
         return bb;
 
-    // Set head:
-    int head = 0;
-
-    while (tmp_a != NULL && !head) {
-        tmp_b = bb->head;
-        while (tmp_b != NULL) {
-            if (set->cmpfunc(tmp_a->item, tmp_b->item) == 0) {
-                if (set->head == NULL) {
-                    set->head = tmp_a;
-                    set->size++;
-                    tmp_i = set->head;
-                    head = 1;
-                    break;
-                }
-            }
+    /* Add all elements with equal value. */
+    while (tmp_a != NULL && tmp_b != NULL) {
+        if (set->cmpfunc(tmp_a->item, tmp_b->item) > 0) {
             tmp_b = tmp_b->next;
-        }
-        tmp_a = tmp_a->next;
-    }
-
-    if (tmp_i == NULL)
-        return set;
-
-    // TODO: Can this be integrated in the loop above?
-    while (tmp_a != NULL) {
-        tmp_b = bb->head;
-        while (tmp_b != NULL) {
-            if (set->cmpfunc(tmp_a->item, tmp_b->item) == 0) {
-                tmp_i->next = tmp_a;
+        } else if (set->cmpfunc(tmp_a->item, tmp_b->item) == 0) {
+            if (tmp_i != NULL) {
+                tmp_i->next = tmp_b;
+                tmp_b = tmp_b->next;
+                tmp_a = tmp_a->next;
                 set->size++;
                 tmp_i = tmp_i->next;
-                break;
+            } else {
+                set->head = tmp_b;
+                tmp_b = tmp_b->next;
+                tmp_a = tmp_a->next;
+                set->size++;
+                tmp_i = set->head;
             }
-            tmp_b = tmp_b->next;
+        } else {
+            tmp_a = tmp_a->next;
         }
-        tmp_a = tmp_a->next;
     }
+
+    if (tmp_i != NULL)
+        tmp_i->next = NULL;
 
     return set;
 }
@@ -322,58 +310,48 @@ set_t *set_difference(set_t *a, set_t *b) {
     node_t *tmp_a, *tmp_b, *tmp_d;
     tmp_a = aa->head;
     tmp_b = bb->head;
+    tmp_d = NULL;
 
-    // If a is empty, return an empty set. If b is empty, return a.
+    /* If a is empty, return an empty set. If b is empty, return a. */
     if (tmp_a == NULL)
         return set;
     if (tmp_b == NULL)
         return aa;
 
-    // Find head.
-    int head = 0;
-    while (tmp_a != NULL && !head) {
-        int add = 1;
-        tmp_b = bb->head;
-        while (tmp_b != NULL) {
-            if (set->cmpfunc(tmp_a->item, tmp_b->item) == 0) {
-                add = 0;
-                break;
-            }
+    /* Insert elements from A that are not contained in B. */
+    while (tmp_a != NULL && tmp_b != NULL) {
+        if (set->cmpfunc(tmp_a->item, tmp_b->item) > 0) {
             tmp_b = tmp_b->next;
+        } else if (set->cmpfunc(tmp_a->item, tmp_b->item) == 0) {
+            tmp_b = tmp_b->next;
+            tmp_a = tmp_a->next;
+        } else {
+            if (tmp_d != NULL) {
+                tmp_d->next = tmp_a;
+                set->size++;
+                tmp_a = tmp_a->next;
+                tmp_d = tmp_d->next;
+            } else {
+                set->head = tmp_a;
+                tmp_a = tmp_a->next;
+                set->size++;
+                tmp_d = set->head;
+            }
         }
-        if (add == 1) {
-            set->head = tmp_a;
-            set->size++;
-            tmp_d = set->head;
-            head = 1;
-        }
-        tmp_a = tmp_a->next;
     }
 
-    // Rest.
-    // TODO: Can this be integrated in the loop above?
-    while (tmp_a != NULL) {
-        int add = 1;
-        tmp_b = bb->head;
-
-        while (tmp_b != NULL) {
-            if (set->cmpfunc(tmp_a->item, tmp_b->item) == 0) {
-                add = 0;
-                break;
-            }
-            tmp_b = tmp_b->next;
-        }
-
-        if (add == 1) {
+    /* Add remaining elements. */
+    if (tmp_a != NULL) {
+        while (tmp_a != NULL) {
             tmp_d->next = tmp_a;
+            tmp_a = tmp_a->next;
             set->size++;
             tmp_d = tmp_d->next;
         }
-
-        tmp_a = tmp_a->next;
+    } else {
+        if (tmp_d != NULL)
+            tmp_d->next = NULL;
     }
-
-    tmp_d->next = NULL;
 
     return set;
 }
@@ -394,9 +372,10 @@ set_t *set_copy(set_t *set) {
 
     node_t *node = malloc(sizeof(node_t));
 
-    if (node == NULL)
-        //TODO: Remove all elements of failed copy.
+    if (node == NULL) {
+        set_destroy(copy);
         return NULL;
+    }
 
     node->item = tmp->item;
     node->next = NULL;
@@ -408,8 +387,10 @@ set_t *set_copy(set_t *set) {
 
     while (tmp != NULL && tmp_c != NULL) {
         node_t *new = malloc(sizeof(node_t));
-        if (node == NULL)
+        if (node == NULL) {
+            set_destroy(copy);
             return NULL;
+        }
 
         new->item = tmp->item;
         new->next = NULL;
