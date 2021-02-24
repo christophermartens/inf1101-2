@@ -2,7 +2,7 @@
 #include "set.h"
 #include <stdlib.h>
 
-/* 
+/*
  * Parameters for the test case:
  * TEST_SEED_VALUE is the initial seed to randomly generate values
  * TEST_SET_SIZE is the number of elements to add to a test set
@@ -351,7 +351,7 @@ void validate_set_operations(unsigned int seed)
 
 int main(int argc, char **argv)
 {
-	int i;
+    int i;
 	
 	srand(1);
 	

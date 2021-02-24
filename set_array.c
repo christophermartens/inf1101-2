@@ -5,8 +5,6 @@
 
 #define MAX_ITEMS 16
 
-typedef struct node node_t;
-
 struct set {
     cmpfunc_t cmpfunc;
     void **items;

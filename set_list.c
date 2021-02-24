@@ -16,7 +16,6 @@ struct set {
     int size;
 };
 
-
 /*
  * Creates a new set using the given comparison function
  * to compare elements of the set.

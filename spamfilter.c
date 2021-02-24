@@ -3,6 +3,8 @@
 #include "set.h"
 #include "common.h"
 
+#include <sys/time.h>
+
 /*
  * Case-insensitive comparison function for strings.
  */

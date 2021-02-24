@@ -32,7 +32,7 @@ set_t *set_create(cmpfunc_t cmpfunc) {
 }
 
 /*
- * Destroys the given set.  Subsequently accessing the set
+ * Destroys the given set. Subsequently accessing the set
  * will lead to undefined behavior.
  */
 void set_destroy(set_t *set) {
@@ -85,7 +85,6 @@ int set_contains(set_t *set, void *elem) {
             list_destroyiter(iter);
             return 1;
         }
-
     }
 
     list_destroyiter(iter);
